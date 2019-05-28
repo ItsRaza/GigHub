@@ -43,5 +43,62 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+    <script type="text/x-template" id="notification-template">
+        <ul class="notifications">
+            <%
+                _.each(notifications,function(notification){
+                    if (notification.type==1){ %>
+                        <li><span class="highlight" style="font-weight:bold"><%=notification.gig.artist.name %></span> has canceled the gig at <%=notification.gig.venue %> at <%=notification.gig.dateTime %> </li>
+                    <% }
+                    else if(notification.type==2){
+                        var changes =[],
+                            originalVals=[],
+                            newVals=[];
+                         
+                        if(notification.OriginalVenue != notification.gig.venue){
+                            changes.push('venue');
+                            originalVals.push(notification.OriginalVenue);
+                            newVals.push(notification.gig.venue); 
+                        }
+
+                        if(notification.OriginalDateTime != notification.gig.dateTime){
+                            changes.push('date/time');
+                            originalVals.push(notification.OriginalDateTime);
+                            newVals.push(notification.gig.dateTime);
+                        }  %>
+
+                        <li><%=notification.gig.artist.name %> has changed the <%=changes.join(' and ')%> of the gig from <%= originalVals.join('/') %> to <%=newVals.join('/') %> </li>
+                    <%}
+                    else if(notification.type==3){ %>
+                        <li><span class="highlight"><%=notification.gig.artist.name %></span> has deleted the gig to <%=notification.gig.venue %> at <%=notification.gig.dateTime %> </li>
+                    <%}
+                })
+            %>
+        </ul>
+    </script>
+    <script>
+        $(document).ready(function () {
+            $.getJSON("/api/notifications", function (notifications) {
+                if (notifications.length == 0)
+                    return;
+
+                $(".js-notification-count")
+                    .text(notifications.length)
+                    .removeClass("hide")
+                    .addClass("animated bounceInDown");
+
+                $(".notifications").popover({
+                    html: true,
+                    title: "Notifications",
+                    content: function () {
+                        var complied = _.template($("#notification-template").html());
+                        return complied({ notifications:notifications });
+                    },
+                    placement: "bottom",
+                    //template: '<div class="popover popover-notifications" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+                });
+            });
+        });
+    </script>
 </body>
 </html>

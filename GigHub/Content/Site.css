@@ -37,6 +37,15 @@ span.field-validation-error {
 .navbar-inverse .navbar-brand {
     color: #fff;
 }
+.navbar-inverse .notifications{
+    position:relative;
+}
+.navbar-inverse .notifications .badge{
+    position:absolute;
+    top:8px;
+    right:0px;
+    background:#a80a0a;
+}
 .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
     color: #ffffff;
     background-color: #e13d3ced;
@@ -145,4 +154,21 @@ h6,
 }
 .gigs > li:hover .actions{
     display:block;
+}
+.popover-notifications .popover-content{
+    padding:0;
+}
+ul.notifications{
+    padding-left:0;
+    list-style:none;
+}
+ul.notifications >li {
+    border-bottom:1px solid #ddd;
+    padding:10px 0;
+}
+ul.notifications >li:last-child{
+    border-bottom:none;
+}
+ul.notifications .highlight{
+    font-weight:bold;
 }

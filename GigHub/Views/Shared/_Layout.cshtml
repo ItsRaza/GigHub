@@ -40,15 +40,14 @@
         </footer>
     </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/lib")
     @RenderSection("scripts", required: false)
     <script type="text/x-template" id="notification-template">
         <ul class="notifications">
             <%
                 _.each(notifications,function(notification){
                     if (notification.type==1){ %>
-                        <li><span class="highlight" style="font-weight:bold"><%=notification.gig.artist.name %></span> has canceled the gig at <%=notification.gig.venue %> at <%=notification.gig.dateTime %> </li>
+                        <li><span class="highlight" style="font-weight:bold"><%=notification.gig.artist.name %></span> has canceled the gig at <%=notification.gig.venue %> at <%= moment(notification.gig.dateTime).format("D MMM HH:mm") %> </li>
                     <% }
                     else if(notification.type==2){
                         var changes =[],
@@ -63,8 +62,8 @@
 
                         if(notification.OriginalDateTime != notification.gig.dateTime){
                             changes.push('date/time');
-                            originalVals.push(notification.OriginalDateTime);
-                            newVals.push(notification.gig.dateTime);
+                            originalVals.push(moment(notification.OriginalDateTime).format("D MMM HH:mm"));
+                            newVals.push(moment(notification.gig.dateTime).format("D MMM HH:mm"));
                         }  %>
 
                         <li><%=notification.gig.artist.name %> has changed the <%=changes.join(' and ')%> of the gig from <%= originalVals.join('/') %> to <%=newVals.join('/') %> </li>
@@ -95,7 +94,13 @@
                         return complied({ notifications:notifications });
                     },
                     placement: "bottom",
-                    //template: '<div class="popover popover-notifications" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+                    template: '<div class="popover popover-notifications" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+                }).on("shown.bs.popover", function () {
+                    $.post("/api/notifications/markAsRead")
+                        .done(function () {
+                            $(".js-notifications-count")
+                                .text("").addClass("hide");
+                        });
                 });
             });
         });
